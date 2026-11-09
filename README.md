@@ -1,215 +1,166 @@
-# SubFinder
-[![License](https://img.shields.io/badge/license-MIT-_red.svg)](https://opensource.org/licenses/MIT)
-[![Twitter](https://img.shields.io/badge/twitter-@Ice3man543-blue.svg)](https://twitter.com/Ice3man543)
-[![Twitter](https://img.shields.io/badge/twitter-@codingo__-blue.svg)](https://twitter.com/codingo_)
+<h1 align="center">
+  <img src="static/subfinder-logo.png" alt="subfinder" width="200px">
+  <br>
+</h1>
 
-[![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
+<h4 align="center">Fast passive subdomain enumeration tool.</h4>
 
-SubFinder is a subdomain discovery tool that uses various techniques to discover massive amounts of subdomains for any target. It has been aimed as a successor to the [sublist3r project](https://github.com/aboul3la/Sublist3r). SubFinder uses Passive Sources, Search Engines, Pastebins, Internet Archives, etc to find subdomains and then it uses a permutation module inspired by altdns to generate permutations and resolve them quickly using a powerful bruteforcing engine. It can also perform plain bruteforce if needed. The tool is highly customizable, and the code is built with a modular approach in mind making it easy to add functionalities and remove errors.
 
-[![asciicast](https://raw.githubusercontent.com/Ice3man543/ice3man543.github.io/master/assets/asciinema.png)](https://asciinema.org/a/177851)
+<p align="center">
+<a href="https://goreportcard.com/report/github.com/projectdiscovery/subfinder/v2"><img src="https://goreportcard.com/badge/github.com/projectdiscovery/subfinder"></a>
+<a href="https://github.com/projectdiscovery/subfinder/issues"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"></a>
+<a href="https://github.com/projectdiscovery/subfinder/releases"><img src="https://img.shields.io/github/release/projectdiscovery/subfinder"></a>
+<a href="https://twitter.com/pdiscoveryio"><img src="https://img.shields.io/twitter/follow/pdiscoveryio.svg?logo=twitter"></a>
+<a href="https://discord.gg/projectdiscovery"><img src="https://img.shields.io/discord/695645237418131507.svg?logo=discord"></a>
+</p>
 
-# Why?
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#installation">Install</a> •
+  <a href="#running-subfinder">Usage</a> •
+  <a href="#post-installation-instructions">API Setup</a> •
+  <a href="#subfinder-go-library">Library</a> •
+  <a href="https://discord.gg/projectdiscovery">Join Discord</a>
+</p>
 
-This project began it's life as a Bug Bounty World slack channel discussion. We were talking about how the cornerstone subdomain tool at the time, sublist3r, appeared to have been abandoned. The goal of this project was to make a low dependancy, manageable project in Go that would continue to be maintained over time. I decided to rewrite the sublist3r project and posted about it. @codingo offered to contribute to the project and subfinder was born. 
+---
+
+
+`subfinder` is a subdomain discovery tool that returns valid subdomains for websites, using passive online sources. It has a simple, modular architecture and is optimized for speed. `subfinder` is built for
+doing one thing only - passive subdomain enumeration, and it does that very well.
+
+We have made it to comply with all the used passive source licenses and usage restrictions. The passive model guarantees speed and stealthiness that can be leveraged by both penetration testers and bug bounty
+hunters alike.
 
 # Features
 
-- Simple and modular code base making it easy to contribute.
-- Fast And Powerful Bruteforcing Module 
-- Powerful Permutation generation engine. (In Development)
-- Many Passive Data Sources (27 At Present)
-- Multiple Output formats
+<h1 align="left">
+  <img src="static/subfinder-run.png" alt="subfinder" width="700px"></a>
+  <br>
+</h1>
 
-> Ask, Archive.is, Baidu, Bing, Censys, CertDB, CertSpotter, CrtSH, DnsDB, DNSDumpster, Dogpile, Entrust CT-Search, Exalead, FindSubdomains, Hackertarget, IPv4Info, Netcraft, PassiveTotal, PTRArchive, Riddler, SecurityTrails, SiteDossier, ThreatCrowd, ThreatMiner, Virustotal, WaybackArchive, Yahoo
+- Fast and powerful resolution and wildcard elimination modules
+- **Curated** passive sources to maximize results
+- Multiple output formats supported (JSON, file, stdout)
+- Optimized for speed and **lightweight** on resources
+- **STDIN/OUT** support enables easy integration into workflows
 
 # Usage
 
-```bash
-./subfinder -h 
+```sh
+subfinder -h
 ```
+
 This will display help for the tool. Here are all the switches it supports.
 
-| Flag | Description | Example |
-|------|-------------|---------|
-| -b   | Use bruteforcing to find subdomains | ./subfinder -d example.com -b |
-| -c   | Don't show colored output            | ./subfinder -c |
-| -d   | Domain to find subdomains for        | ./subfinder -d example.com |
-| -dL  | List of domains to find subdomains for | ./subfinder -dl hosts.txt | 
-| -nW  | Remove wildcard subdomains           | ./subfinder -nw |
-| -o   | Name of the output file (Optional)   | ./subfinder -o output.txt | 
-| -oT  | Write output in Aquatone style JSON format (Required -nW)  | ./subfinder -o output.txt -nw -oA | 
-| -oJ  | Write output in JSON format          | ./subfinder -o output.json -oJ |
-| -oD  | Output to directory (When using multiple hosts) | ./subfinder -od ~/misc/out/ |
-| -r  | Comma-separated list of resolvers to use | ./subfinder -r 8.8.8.8,1.1.1.1 |
-| -rL  | File containing list of resolvers to use | ./subfinder -rL resolvers.txt |
-| --recursive  | Use recursive subdomain finding (default: true) | ./subfinder --recursive |
-| --set-config | Sets a configuration option | ./subfinder --set-config example=something |
-| --set-settings | Sets a setting option | ./subfinder --set-settings CensysPages=10 |
-| --silent | Show only the subdomains found    | ./subfinder --silent |
-| --sources | Comma separated list of sources to use (optional) | ./subfinder --sources threatcrowd,virustotal |
-| --exclude-sources | Comma separated list of sources not to use (optional) | ./subfinder --exclude-sources threatcrowd,virustotal |
-| -t   | Number of concurrent threads (Bruteforce) | ./subfinder -t 10 |
-| --timeout | Seconds to wait until quitting connection | ./subfinder --timeout 10 |
-| -v | Display verbose output  | ./subfinder -v |
-| -w | Wordlist for doing bruteforcing and permutation | ./subfinder -w words.txt | 
+```yaml
+Usage:
+  ./subfinder [flags]
 
-# Installation Instructions
-## Direct Installation
+Flags:
+INPUT:
+  -d, -domain string[]  domains to find subdomains for
+  -dL, -list string     file containing list of domains for subdomain discovery
 
-#### SubFinder requires go1.10+ to install successfully !
+SOURCE:
+  -s, -sources string[]           specific sources to use for discovery (-s crtsh,github). Use -ls to display all available sources.
+  -recursive                      use only sources that can handle subdomains recursively (e.g. subdomain.domain.tld vs domain.tld)
+  -all                            use all sources for enumeration (slow)
+  -es, -exclude-sources string[]  sources to exclude from enumeration (-es alienvault,zoomeyeapi)
 
-The installation is easy. Git clone the repo and run go build.
+FILTER:
+  -m, -match string[]     subdomain or list of subdomain to match (file or comma separated)
+  -f, -filter string[]     subdomain or list of subdomain to filter (file or comma separated)
+  -match-regex string[]   regex or list of regex to match on output subdomain (cli, file)
+  -filter-regex string[]  regex or list of regex to filter on output subdomain (cli, file)
 
-```bash
-go get github.com/Ice3man543/subfinder
+RATE-LIMIT:
+  -rl, -rate-limit int  maximum number of http requests to send per second
+  -rls value            maximum number of http requests to send per second for providers in key=value format (-rls "hackertarget=10/s,shodan=15/s")
+  -t int                number of concurrent goroutines for resolving (-active only) (default 10)
+
+UPDATE:
+  -up, -update                 update subfinder to latest version
+  -duc, -disable-update-check  disable automatic subfinder update check
+
+OUTPUT:
+  -o, -output string       file to write output to
+  -oJ, -json               write output in JSONL format
+  -oD, -output-dir string  directory to write output (-dL only)
+  -cs, -collect-sources    include all sources in the output (-json only)
+  -oI, -ip                 include host IP in output (-active only)
+
+CONFIGURATION:
+  -config string                flag config file (default "$CONFIG/subfinder/config.yaml")
+  -pc, -provider-config string  provider config file (default "$CONFIG/subfinder/provider-config.yaml")
+  -r string[]                   comma separated list of resolvers to use
+  -rL, -rlist string            file containing list of resolvers to use
+  -nW, -active                  display active subdomains only
+  -proxy string                 http proxy to use with subfinder
+  -ei, -exclude-ip              exclude IPs from the list of domains
+  -mr, -max-results int         limit the number of results per source (0 = unlimited; honored by paginating sources)
+
+DEBUG:
+  -silent             show only subdomains in output
+  -version            show version of subfinder
+  -v                  show verbose output
+  -nc, -no-color      disable color in output
+  -ls, -list-sources  list all available sources (-oJ for JSON)
+
+OPTIMIZATION:
+  -timeout int                  seconds to wait before timing out (default 30)
+  -max-time int                 minutes to wait for enumeration results (default 10)
+  -rsr, -response-size-read int max response body size to read in bytes from passive sources (0 = unlimited)
 ```
 
-## Upgrading
-If you wish to upgrade the package you can use:
-```bash
-go get -u github.com/Ice3man543/subfinder
+## Environment Variables
+
+Subfinder supports environment variables to specify custom paths for configuration files:
+
+- `SUBFINDER_CONFIG` - Path to config.yaml file (overrides default `$CONFIG/subfinder/config.yaml`)
+- `SUBFINDER_PROVIDER_CONFIG` - Path to provider-config.yaml file (overrides default `$CONFIG/subfinder/provider-config.yaml`)
+
+# Installation
+
+`subfinder` requires **go1.26.10** to install successfully. Run the following command to install the latest version:
+
+```sh
+go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
 ```
-## Running in a Docker Container
 
-Git clone the repo, then build and run subfinder in a container with the following commands
-
-- Clone the repo using `git clone https://github.com/Ice3man543/subfinder.git`
-- Build your docker container
-```bash
-docker build -t subfinder .
-```
-
-- After building the container, run the following.
-```bash
-docker run -it subfinder
-```
-> The above command is the same as running `-h`
-
-***NOTE: Please follow the Post Install steps given after this to correctly configure the tool.***
-
-For example, this runs the tool against uber.com and output the results to your host file system:
-```bash
-docker run -v $HOME/.config/subfinder:/root/.config/subfinder -it subfinder -d uber.com > uber.com.txt
-```
+Learn about more ways to install subfinder here: https://docs.projectdiscovery.io/tools/subfinder/install.
 
 ## Post Installation Instructions
 
-Subfinder will work after using the installation instructions however to configure Subfinder to work with certain services, you will need to have setup API keys. These following services do not work without an API key:
+`subfinder` can be used right after the installation, however many sources required API keys to work. Learn more here: https://docs.projectdiscovery.io/tools/subfinder/install#post-install-configuration.
 
-- [Virustotal](https://www.virustotal.com/) 
-- [Passivetotal](http://passivetotal.org/)
-- [SecurityTrails](http://securitytrails.com/)
-- [Censys](https://censys.io)
-- [Riddler](https://riddler.io)
+## Running Subfinder
 
-These are the configuration options you have to specify via the command line.
-```bash
-VirustotalAPIKey 
-PassivetotalUsername 
-PassivetotalKey
-SecurityTrailsKey
-RiddlerEmail
-RiddlerPassword
-CensysUsername
-CensysSecret
+Learn about how to run Subfinder here: https://docs.projectdiscovery.io/tools/subfinder/running.
+
+### Filtering results with regular expressions
+
+`-match-regex` and `-filter-regex` take Go regular expressions, repeated or from a file (one per line), and combine with `-match` and `-filter`:
+
+```sh
+subfinder -d example.com -match-regex '^(api|web)[0-9]{1,3}\.' -filter-regex '(^|\.)dev\.'
 ```
 
-Theses values are stored in the $HOME/.config/subfinder/config.json file which will be created when you run the tool for the first time. To configure the services to use an API key, you need to use the tool with --set-config option which will allow you to set a configuration option. For example:
+## Subfinder Go library
 
-```bash
-./subfinder --set-config VirustotalAPIKey=0x41414141
-./subfinder --set-config PassivetotalUsername=hacker,PassivetotalKey=supersecret
-```
+Subfinder can also be used as library and a minimal examples of using subfinder SDK is available [here](examples/main.go)
 
-If you are using docker, you need to first create your directory structure holding subfinder configuration file. You can either run the binary in your host system and let it create the directory structure of files, after which you can use --set-config flag to set the api values like before. Or you can run:
-```bash
-mkdir $HOME/.config/subfinder
-cp config.json $HOME/.config/subfinder/config.json
-nano $HOME/.config/subfinder/config.json
-```
-After that, you can pass it as a volume using the following sample command.
-```bash
-sudo docker run -v $HOME/.config/subfinder:/root/.config/subfinder -it subfinder -d freelancer.com
-```
-Now, you can also pass --set-config inside the docker to change the configuration options.
+</td>
+</tr>
+</table>
 
-# Running the tool
+### Resources
 
-To run the tool on a target, just use the following command.
-```bash
-./subfinder -d freelancer.com
-```
-This will run the tool against freelancer.com. There are a number of configuration options that you can pass along with this command. The verbose switch (-v) can be used to display verbose information.
+- [Recon with Me !!!](https://dhiyaneshgeek.github.io/bug/bounty/2020/02/06/recon-with-me/)
 
-```bash
-[CERTSPOTTER] www.fi.freelancer.com
-[DNSDUMPSTER] hosting.freelancer.com
-[DNSDUMPSTER] support.freelancer.com
-[DNSDUMPSTER] accounts.freelancer.com
-[DNSDUMPSTER] phabricator.freelancer.com
-[DNSDUMPSTER] cdn1.freelancer.com
-[DNSDUMPSTER] t1.freelancer.com
-[DNSDUMPSTER] wdc.t1.freelancer.com
-[DNSDUMPSTER] dal.t1.freelancer.com
-```
+# License
 
-The -o command can be used to specify an output file.
+`subfinder` is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team. Community contributions have made the project what it is. See
+the **[THANKS.md](https://github.com/projectdiscovery/subfinder/blob/main/THANKS.md)** file for more details.
 
-```bash
-./subfinder -d freelancer.com -o output.txt
-```
-
-You can also get output in json format using -oJ switch.
-The --silent switch can be used to show only subdomains found without any other info.
-The --set-config switch can be used to set the value of any configuration option as explained above in the readme.
-
-You can also pass some special settings for the tool through the command line by using --set-setting flag.
-For example, you can pass the number of Censys pages to check using the following command.
-```bash
-./subfinder -d freelancer.com --sources censys --set-settings CensysPages=2 -v 
-```
-For checking all pages returned by censys, you can use "all" option. Note, It is a string.
-
-These are the settings currently supported 
-```bash
-CensysPages
-AskPages
-BaiduPages
-BingPages
-```
-
-For using bruteforcing capabilities, you can use -b flag with -w option to specify a wordlist.
-```bash
-./subfinder -d freelancer.com -b -w jhaddix_all.txt -t 100 --sources censys --set-settings CensysPages=2 -v 
-```
-
-You can also write output in JSON format as used by Aquatone.
-```bash
-./subfinder -d freelancer.com -o result_aquatone.json -oT -nW -v 
-```
-
-You can specify custom resolvers too.
-```bash
-./subfinder -d freelancer.com -o result_aquatone.json -oT -nW -v -r 8.8.8.8,1.1.1.1
-./subfinder -d freelancer.com -o result_aquatone.json -oT -nW -v -rL resolvers.txt
-```
-
-# Frequently Asked Questions (FAQ)
-## How do I move settings between machines?
-Configuration for subfinder is saved at ```~/.config/subfinder/config.json``` which can be copied between machines.
-
-## Do I need to use API keys?
-No. The majority of sources for subfinder don't require API keys, you just won't see as many results. Check the post installation instructions for which sources require API keys.
-
-## I wish SubFinder did x...
-We're extremely open to pull requests, if you wish to have a feature feel free to develop it and push it to here for review and inclusion in the main project. If you're unable to code something, please raise it as an issue and if we think it has benefit to the community we'll look into developing it for you.
-
-## Why is this a better tool than xyz tool?
-There are a number of subdomain tools, and we beleive you should try each of them to find the one that works well with how you like to approach subdomain discovery. We've developed subfinder to solve subdomain finding in a way that we felt worked best for the way we work, and was easily maintainable to allow us and others to add as many sources and features as possible.
-
-# Acknowledgements
-
-- @FranticFerret for his work on adding docker support.
-- @himanshudas for adding DnsDB support
-- @Mzack9999 for fixing and improving docker builds and adding Ask, Baidu, Bing Search Engine Support !
+Read the usage disclaimer at [DISCLAIMER.md](https://github.com/projectdiscovery/subfinder/blob/main/DISCLAIMER.md) and [contact us](mailto:contact@projectdiscovery.io) for any API removal.

@@ -1,15 +1,15 @@
-# iron/go:dev is the alpine image with the go tools added
-FROM golang
-WORKDIR /app
+FROM alpine:latest
 
-# Set an env var that matches your github repo name
-ENV SRC_DIR=/go/src/github.com/Ice3man543/subfinder/
+LABEL org.opencontainers.image.authors="ProjectDiscovery"
+LABEL org.opencontainers.image.description="Fast passive subdomain enumeration tool."
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.title="subfinder"
+LABEL org.opencontainers.image.url="https://github.com/projectdiscovery/subfinder"
 
-# Add the source code:
-ADD . $SRC_DIR
+RUN apk upgrade --no-cache \
+    && apk add --no-cache bind-tools ca-certificates
 
-# Build it:
-RUN cd $SRC_DIR; go get; go build -o main; cp main /app/
+ARG TARGETPLATFORM
+COPY $TARGETPLATFORM/subfinder /usr/local/bin/
 
-ENTRYPOINT ["./main"]
-CMD ["-h"]
+ENTRYPOINT ["subfinder"]
